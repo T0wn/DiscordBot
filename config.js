@@ -1,9 +1,4 @@
-const config = {
-    bot_token = '',
-}
 
-const BOT_TOKEN = config.bot_token;
+const BOT_TOKEN = '';
 
-export {BOT_TOKEN};
-
-export default config;
+module.exports = BOT_TOKEN;
