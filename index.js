@@ -7,7 +7,7 @@ bot.on('ready', () => {
 });
 
 
-// let ashamed_users = [];
+let ashamed_users = [];
 
 bot.on('voiceStateUpdate', (oldMember, newMember) => {
     console.log('VoiceStateChange');
@@ -15,13 +15,25 @@ bot.on('voiceStateUpdate', (oldMember, newMember) => {
     const verdiloosRole = newMember.guild.roles.cache.find(role => role.name == 'verdiløs');
     // console.log(verdiloosRole);
 
-    const newChannelName = newMember.channel.name;
-    const user = oldMember.member;
+    const newChannel = newMember.channel;
+    const newUser = newMember.member;
+    const oldUser = oldMember.member;
 
     // console.log(user.roles.cache);
 
-    if (newChannelName == 'Skammekroken') {
-        user.roles.set([verdiloosRole]);
+    if (newChannel != null) {
+        if (newChannel.name == 'Skammekroken') {
+            ashamed_users.push({ ...oldUser });
+            console.log(ashamed_users);
+
+            newUser.roles.set([verdiloosRole]);
+            console.log('verdiløs');
+        }
+        else {
+            console.log('ikke verdiløs lenger');
+            const originalRoles = ashamed_users.find(usr => usr.id == oldUser.id).roles.cache;
+            console.log(originalRoles);
+        }
     }
 });
 
