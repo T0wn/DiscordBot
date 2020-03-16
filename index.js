@@ -9,26 +9,20 @@ bot.on('ready', () => {
 
 // let ashamed_users = [];
 
-async function getChannelName(channelID) {
-    const name = await bot.channels.fetch(channelID).then((channel) => (channel.name));
-    return name;
-}
-
 bot.on('voiceStateUpdate', (oldMember, newMember) => {
     console.log('VoiceStateChange');
-    // console.log(oldMember);
-    // console.log(newMember);
 
-    (async () => {
-        const newChannelName = await getChannelName(newMember.channelID);
-        const user = await oldMember.guild.members.fetch('153951942677233665').then((member) => (member.user));
+    const verdiloosRole = newMember.guild.roles.cache.find(role => role.name == 'verdiløs');
+    // console.log(verdiloosRole);
 
-        console.log(user);
+    const newChannelName = newMember.channel.name;
+    const user = oldMember.member;
 
-        if (newChannelName == 'Skammekroken') {
-            console.log('Skam deg!');
-        }
-    })();
+    // console.log(user.roles.cache);
+
+    if (newChannelName == 'Skammekroken') {
+        user.roles.set([verdiloosRole]);
+    }
 });
 
 
