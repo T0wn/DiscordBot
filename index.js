@@ -7,32 +7,27 @@ bot.on('ready', () => {
 });
 
 
-let ashamed_users = [];
+const ashamed_users = [];
 
+// voiceStateUpdate triggres på all voiceChannel change, inkludert mute, deafen, etc.
 bot.on('voiceStateUpdate', (oldMember, newMember) => {
     console.log('VoiceStateChange');
 
     const verdiloosRole = newMember.guild.roles.cache.find(role => role.name == 'verdiløs');
-    // console.log(verdiloosRole);
 
     const newChannel = newMember.channel;
+    const oldChannel = oldMember.channel;
     const newUser = newMember.member;
     const oldUser = oldMember.member;
 
-    // console.log(user.roles.cache);
-
     if (newChannel != null) {
-        if (newChannel.name == 'Skammekroken') {
-            ashamed_users.push({ ...oldUser });
-            console.log(ashamed_users);
-
+        if (newChannel.name == 'Skammekroken' && oldChannel.id != newChannel.id) {
+            ashamed_users.push({ userID: oldUser.id, roles: oldUser.roles.cache });
             newUser.roles.set([verdiloosRole]);
-            console.log('verdiløs');
         }
-        else {
-            console.log('ikke verdiløs lenger');
-            const originalRoles = ashamed_users.find(usr => usr.id == oldUser.id).roles.cache;
-            console.log(originalRoles);
+        else if (newChannel != 'Skammekroken' && newChannel != null && oldChannel.id != newChannel.id) {
+            const originalRoles = ashamed_users.find(usr => usr.userID == oldUser.id).roles;
+            newUser.roles.set(originalRoles);
         }
     }
 });
