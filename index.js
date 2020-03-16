@@ -13,7 +13,7 @@ const ashamed_users = [];
 bot.on('voiceStateUpdate', (oldMember, newMember) => {
     console.log('VoiceStateChange');
 
-    const verdiloosRole = newMember.guild.roles.cache.find(role => role.name == 'verdiløs');
+    const verdiloosRole = newMember.guild.roles.cache.find(role => role.name == 'Verdiløs');
 
     const newChannel = newMember.channel;
     const oldChannel = oldMember.channel;
