@@ -4,7 +4,7 @@ COPY . /app
 
 WORKDIR /app
 
-RUN npm i -y
+RUN npm i -y --only=prod
 
 ENTRYPOINT ["node"]
 
