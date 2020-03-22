@@ -1,6 +1,21 @@
 const { TOKEN } = require('./config.json');
+const woodlotCustomLogger = require('woodlot').customLogger;
 const Discord = require('discord.js');
+
 const bot = new Discord.Client();
+
+const woodlot = new woodlotCustomLogger({
+    streams: ['./logs/skammekroken.log'],
+    stdout: false,
+    format: {
+        type: 'json',
+        options: {
+            spacing: 4,
+            separator: '\n',
+        },
+    },
+});
+
 
 bot.on('ready', () => {
     console.log('Bot online');
@@ -20,11 +35,6 @@ bot.on('voiceStateUpdate', async (oldMember, newMember) => {
     const newUser = newMember.member;
     const oldUser = oldMember.member;
 
-    // console.log('newChannel: ' + newChannel);
-    // console.log('oldChannel: ' + oldChannel);
-    // console.log('newUser: ' + newUser);
-    // console.log('oldUser: ' + oldUser);
-
     if (newUser.user != bot.user) {
         if (newChannel != null && oldChannel != null) {
             if (newChannel.name == 'Skammekroken' && oldChannel.id != newChannel.id) {
@@ -38,6 +48,18 @@ bot.on('voiceStateUpdate', async (oldMember, newMember) => {
                 dispatcher.on('finish', () => {
                     dispatcher.destroy();
                     connenction.disconnect();
+                });
+
+                woodlot.info({
+                    event: 'skammekroken-join',
+                    guild: {
+                        id: newUser.guild.id,
+                        name: newUser.guild.name,
+                    },
+                    user: {
+                        id: newUser.user.id,
+                        username: newUser.user.username,
+                    },
                 });
             }
             else if (newChannel != 'Skammekroken' && newChannel != null && oldChannel.id != newChannel.id) {

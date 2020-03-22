@@ -6,6 +6,8 @@ WORKDIR /app
 
 RUN npm i -y --only=prod
 
+VOLUME /app/logs
+
 ENTRYPOINT ["node"]
 
 CMD ["."]
