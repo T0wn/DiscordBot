@@ -20,20 +20,22 @@ bot.on('voiceStateUpdate', (oldMember, newMember) => {
     const newUser = newMember.member;
     const oldUser = oldMember.member;
 
-    console.log('newChannel' + newChannel);
-    console.log('oldChannel' + oldChannel);
-    console.log('newUser' + newUser);
-    console.log('oldUser' + oldUser);
+    // console.log('newChannel: ' + newChannel);
+    // console.log('oldChannel: ' + oldChannel);
+    // console.log('newUser: ' + newUser);
+    // console.log('oldUser: ' + oldUser);
 
     if (newChannel != null && oldChannel != null) {
         if (newChannel.name == 'Skammekroken' && oldChannel.id != newChannel.id) {
             ashamed_users.push({ userID: oldUser.id, roles: oldUser.roles.cache });
             newUser.roles.set([verdiloosRole]);
+            newUser.voice.setMute(true);
         }
         else if (newChannel != 'Skammekroken' && newChannel != null && oldChannel.id != newChannel.id) {
             const originalUser = ashamed_users.find(usr => usr.userID == oldUser.id);
             if (originalUser) {
                 newUser.roles.set(originalUser.roles);
+                newUser.voice.setMute(false);
             }
         }
     }
