@@ -1,26 +1,22 @@
-const woodlotCustomLogger = require("woodlot").customLogger;
+const createCsvWriter = require("csv-writer").createObjectCsvWriter;
+var moment = require("moment");
 
-const woodlot = new woodlotCustomLogger({
-  streams: ["./../logs/skammekroken.log"],
-  stdout: false,
-  format: {
-    type: "json",
-    options: {
-      spacing: 4,
-      separator: "\n",
-    },
-  },
+const csvWriter = createCsvWriter({
+  path: "./logs/skammekroken.csv",
+  header: [
+    { id: "time", title: "time" },
+    { id: "guildID", title: "guildID" },
+    { id: "userID", title: "userID" },
+  ],
+  append: true,
 });
 
 module.exports.log_shame = (newUser) => {
-  woodlot.info({
-    event: "skammekroken-join",
-    guild: {
-      id: newUser.guild.id,
+  csvWriter.writeRecords([
+    {
+      time: moment().toISOString(),
+      guildID: newUser.guild.id,
+      userID: newUser.user.id,
     },
-    user: {
-      id: newUser.user.id,
-    },
-  });
-  console.log("hei");
+  ]);
 };
