@@ -1,13 +1,13 @@
-FROM node:12.16.1-buster
+FROM python:3.9-alpine
 
 COPY . /app
 
 WORKDIR /app
 
-RUN npm i -y --only=prod
+RUN pip install -r requirements.txt
 
 VOLUME /app/logs
 
-ENTRYPOINT ["node"]
+ENTRYPOINT ["python3"]
 
-CMD ["."]
+CMD ["main.py"]
