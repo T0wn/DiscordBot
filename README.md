@@ -1,16 +1,13 @@
 # DictatorBot
 
-This is a personal discordbot used to terrorize the members of my discord server.
+This is a personal discordbot used in my own discord server.
 
-The bots main function is to keep people trapped in a voice channel.
-It achives this by removing the roles and privileges of the target when he/she is moved into the voice channel named "Skammekroken" by an admin.
+The idea behind the bot started as a joke. I wanted to prank my friends by keeping them trapped in a voice channel.
+The bot achives this by removing the roles and privileges of the user when he/she is moved into the voice channel named "Skammekroken" by an admin.
 The target no longer has privileges to join or see other voice channels.
 When an admin moves the target out of "Skammekroken" the bot will automatically give back roles and privileges.
 
-As an extra feature the [audio](https://www.youtube.com/watch?v=MaLSdYNqGuQ) from the famous "shame" sceene in Game of thrones
-is played by the bot whenever someone joins "Skammekroken".
-
-Here is an example of how the bot works:
+Here is an example of how it looks for the users:
 
 <table>
   <tr>
@@ -22,3 +19,8 @@ Here is an example of how the bot works:
     <td> <img src="./images/dictatorbot_example_user.gif"> </td>
   </tr>
 </table>
+
+Over time the bot has gotten more features, like logging and audioplaying.
+
+## Discord API
+This project uses the discord [Javascript API](https://discord.js.org/#/) and [Python API wrapper](https://pypi.org/project/discord.py/).
