@@ -1,0 +1,12 @@
+
+secrets/
+images/
+.vscode/
+__pycache__/
+.github/
+
+.gitignore
+LICENSE
+README.md
+Dockerfile
+docker-compose.yml
