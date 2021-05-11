@@ -2,12 +2,4 @@ version: "3.9"
 
 services:
   bot:
-    build: .
-    volumes:
-      - .:/app
-    secrets:
-      - bot_token
-
-secrets:
-  bot_token:
-    file: secrets/bot_token.txt
+    image: t0wn/dictatorbot
