@@ -1,0 +1,2 @@
+discord.py[voice]==1.7.1
+get-docker-secret

@@ -1,13 +1,16 @@
-FROM node:12.16.1-buster
+FROM python:3.8-slim-buster
 
-COPY . /app
+RUN apt update -y && \
+    apt install ffmpeg -y
+
+COPY ./requirements.txt /app/requirements.txt
 
 WORKDIR /app
 
-RUN npm i -y --only=prod
+RUN pip3 install -r requirements.txt
 
-VOLUME /app/logs
+COPY . /app
 
-ENTRYPOINT ["node"]
+ENTRYPOINT [ "python3" ]
 
-CMD ["."]
+CMD ["main.py"]
