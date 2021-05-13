@@ -1,0 +1,16 @@
+name: Deploy to docker swarm
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to swarm
+        uses: sagebind/docker-swarm-deploy-action@v2
+        with:
+          remote_host: ssh://root@139.177.181.244
+          ssh_private_key: ${{ secrets.DOCKER_SSH_PRIVATE_KEY }}
+          ssh_public_key: ${{ secrets.DOCKER_SSH_PUBLIC_KEY }}
+          args: stack deploy --compose-file docker-compose.prod.yml dictatorbot
