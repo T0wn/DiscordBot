@@ -1,5 +1,5 @@
 import discord
-from time import sleep
+from asyncio import sleep
 
 class DictatorBot(discord.Client):
     def __init__(self, skammekroken, verdilos):
@@ -10,7 +10,7 @@ class DictatorBot(discord.Client):
         self.verdilos = verdilos
 
         # lagrer rollene til folk som er verdiløse, slik at de kan få de samme rollene tilbake igjen.
-        self.shamedUsers = []
+        self.shamedUsers = {}
 
 
 
@@ -48,15 +48,18 @@ class DictatorBot(discord.Client):
 
     def add_shamed_user(self, user):
         userInfo = {'user': user, 'roles': user.roles}
-        self.shamedUsers.append(userInfo)
+        uid = f"{user.id} {user.guild.id}"
+        self.shamedUsers[uid] = userInfo
+        print(self.shamedUsers)
 
 
 
     def remove_shamed_user(self, user):
-        for index, userInfo in enumerate(self.shamedUsers):
-            if userInfo['user'] == user:
-                roles_to_assign = self.shamedUsers.pop(index)['roles'][1:] # bruker slicer til å fjerne everyone rollen fra listen. Den kan ikke addes til brukere.
-                return roles_to_assign
+        uid = f"{user.id} {user.guild.id}"
+        roles_to_assign = self.shamedUsers.pop(uid)['roles'][1:]
+        print(self.shamedUsers)
+        return roles_to_assign
+        
 
 
 
@@ -83,7 +86,7 @@ class DictatorBot(discord.Client):
             player = connection.play(audio)
             
             while connection.is_playing():
-                sleep(1)
+                await sleep(1)
             await connection.disconnect()
         except discord.errors.ClientException: # Denne kastes hvis boten allerede er connecta til voicechannelen, f.eks hvis vi kaster 2 personer i skammekroken etter hverandre.
             pass
