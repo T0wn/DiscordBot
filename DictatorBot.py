@@ -56,7 +56,7 @@ class DictatorBot(discord.Client):
 
 
 
-    def remove_shamed_member(self, member):
+    def pop_shamed_member(self, member):
         uid = f"{member.id} {member.guild.id}"
         roles_to_assign = self.shamedMembers.pop(uid)['roles'][1:]
         print(self.shamedMembers)
@@ -94,7 +94,7 @@ class DictatorBot(discord.Client):
                 await sleep(1)
             await connection.disconnect()
         except discord.errors.ClientException: # Denne kastes hvis boten allerede er connecta til voicechannelen, f.eks hvis vi kaster 2 personer i skammekroken etter hverandre.
-            pass
+            return
         except Exception as e:
             print(e)
 
@@ -102,9 +102,6 @@ class DictatorBot(discord.Client):
 
     async def redeem(self, member):
         # fjerner bruker infoen fra shamed users, og henter rollene som skal gies tilbake
-        roles_to_assign = self.remove_shamed_member(member)
+        roles_to_assign = self.pop_shamed_member(member)
+        await member.remove_roles(*member.roles[1:])
         await member.add_roles(*roles_to_assign)
-
-        verdiloosRole = self.get_verdiloosRole(member)
-
-        await member.remove_roles(verdiloosRole)
