@@ -90,7 +90,7 @@ class DictatorBot(discord.Client):
 
             player = connection.play(audio)
             
-            while connection.is_playing():
+            while connection.is_playing() and len(member.voice.channel.voice_states) > 1:
                 await sleep(1)
             await connection.disconnect()
         except discord.errors.ClientException: # Denne kastes hvis boten allerede er connecta til voicechannelen, f.eks hvis vi kaster 2 personer i skammekroken etter hverandre.
@@ -103,5 +103,6 @@ class DictatorBot(discord.Client):
     async def redeem(self, member):
         # fjerner bruker infoen fra shamed users, og henter rollene som skal gies tilbake
         roles_to_assign = self.pop_shamed_member(member)
-        await member.remove_roles(*member.roles[1:])
+        verdiloosRole = self.get_verdiloosRole(member)
         await member.add_roles(*roles_to_assign)
+        await member.remove_roles(verdiloosRole)
