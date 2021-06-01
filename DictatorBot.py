@@ -39,7 +39,7 @@ class DictatorBot(discord.Client):
     def should_be_redeemed(self, user, oldVoiceState, newVoiceState):
         if user != self.user:
             if oldVoiceState.channel and newVoiceState.channel:
-                if newVoiceState.channel.name != self.skammekroken and newVoiceState != oldVoiceState:
+                if newVoiceState.channel.name != self.skammekroken and oldVoiceState.channel.name == self.skammekroken:
                     if newVoiceState.channel:
                         return True
         return False
