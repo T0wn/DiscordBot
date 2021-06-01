@@ -1,4 +1,3 @@
-import json
 from get_docker_secret import get_docker_secret
 
 from DictatorBot import DictatorBot

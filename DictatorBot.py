@@ -10,7 +10,7 @@ class DictatorBot(discord.Client):
         self.verdilos = verdilos
 
         # lagrer rollene til folk som er verdiløse, slik at de kan få de samme rollene tilbake igjen.
-        self.shamedUsers = {}
+        self.shamedMembers = {}
 
 
 
@@ -19,16 +19,18 @@ class DictatorBot(discord.Client):
 
 
     # Denne kjøres hver gang noe i voice kanalene endrer seg (mute, join, leave, etc..).
-    async def on_voice_state_update(self, user, oldVoiceState, newVoiceState):
-        if self.should_be_shamed(user, oldVoiceState, newVoiceState):
-            await self.shame(user)
-        elif self.should_be_redeemed(user, oldVoiceState, newVoiceState):
-            await self.redeem(user)
+    async def on_voice_state_update(self, member, oldVoiceState, newVoiceState):
+        if self.should_be_shamed(member, oldVoiceState, newVoiceState):
+            await self.shame(member)
+        elif self.should_be_redeemed(member, oldVoiceState, newVoiceState):
+            await self.redeem(member)
+
+
 
 
     # sjekker om en bruker skal shames.
-    def should_be_shamed(self, user, oldVoiceState, newVoiceState):
-        if user != self.user:
+    def should_be_shamed(self, member, oldVoiceState, newVoiceState):
+        if member != self.user:
             if oldVoiceState.channel and newVoiceState.channel:
                 if (newVoiceState.channel.name == self.skammekroken and newVoiceState != oldVoiceState):
                     return True
@@ -36,8 +38,8 @@ class DictatorBot(discord.Client):
 
 
     # sjekker om en bruker skal redeemes.
-    def should_be_redeemed(self, user, oldVoiceState, newVoiceState):
-        if user != self.user:
+    def should_be_redeemed(self, member, oldVoiceState, newVoiceState):
+        if member != self.user:
             if oldVoiceState.channel and newVoiceState.channel:
                 if newVoiceState.channel.name != self.skammekroken and oldVoiceState.channel.name == self.skammekroken:
                     if newVoiceState.channel:
@@ -46,41 +48,44 @@ class DictatorBot(discord.Client):
 
 
 
-    def add_shamed_user(self, user):
-        userInfo = {'user': user, 'roles': user.roles}
-        uid = f"{user.id} {user.guild.id}"
-        self.shamedUsers[uid] = userInfo
-        print(self.shamedUsers)
+    def add_shamed_member(self, member):
+        memberInfo = {'user': member, 'roles': member.roles}
+        uid = f"{member.id} {member.guild.id}"
+        self.shamedMembers[uid] = memberInfo
+        print(self.shamedMembers)
 
 
 
-    def remove_shamed_user(self, user):
-        uid = f"{user.id} {user.guild.id}"
-        roles_to_assign = self.shamedUsers.pop(uid)['roles'][1:]
-        print(self.shamedUsers)
+    def remove_shamed_member(self, member):
+        uid = f"{member.id} {member.guild.id}"
+        roles_to_assign = self.shamedMembers.pop(uid)['roles'][1:]
+        print(self.shamedMembers)
         return roles_to_assign
         
 
 
-
-    async def shame(self, user):
-        # henter verdiløs rollen i serveren, hvis den finnes
+    # henter verdiløs rollen i serveren, hvis den finnes
+    def get_verdiloosRole(self, member):
         try:
-            verdiloosRole = next(role for role in user.guild.roles if role.name == self.verdilos)
+            return next(role for role in member.guild.roles if role.name == self.verdilos)
         except StopIteration:
-            print("Exception: could not find verdiløs-role in guild")
-        except Exception as e:
-            print(e)
+            raise StopIteration("could not find verdiløs-role in guild")
+
+
+
+    async def shame(self, member):
+        # henter verdiløs rollen i serveren, hvis den finnes
+        verdiloosRole = self.get_verdiloosRole(member)
         
         # Lagrer brukeren og rollene han hadde før alle rollene blir fjerna.
         # Gir brukeren verdiløs rollen.
-        self.add_shamed_user(user)
-        await user.remove_roles(*user.roles[1:]) # bruker slicer til å fjerne everyone rollen fra listen. Den kan ikke fjernes fra brukere.
-        await user.add_roles(verdiloosRole)
+        self.add_shamed_member(member)
+        await member.remove_roles(*member.roles[1:]) # bruker slicer til å fjerne everyone rollen fra listen. Den kan ikke fjernes fra brukere.
+        await member.add_roles(verdiloosRole)
 
         # Connecter til voicechannel og spiller shame audio
         try:
-            connection = await user.voice.channel.connect()
+            connection = await member.voice.channel.connect()
             audio = discord.FFmpegPCMAudio("./audio/shame-1.mp3")
 
             player = connection.play(audio)
@@ -95,17 +100,11 @@ class DictatorBot(discord.Client):
 
         
 
-    async def redeem(self, user):
+    async def redeem(self, member):
         # fjerner bruker infoen fra shamed users, og henter rollene som skal gies tilbake
-        roles_to_assign = self.remove_shamed_user(user)
-        await user.add_roles(*roles_to_assign)
+        roles_to_assign = self.remove_shamed_member(member)
+        await member.add_roles(*roles_to_assign)
 
-        # henter verdiløs rollen i serveren, hvis den finnes
-        try:
-            verdiloosRole = next(role for role in user.guild.roles if role.name == self.verdilos)
-        except StopIteration:
-            print("Exception: could not find verdiløs-role in guild")
-        except Exception as e:
-            print(e)
+        verdiloosRole = self.get_verdiloosRole(member)
 
-        await user.remove_roles(verdiloosRole)
+        await member.remove_roles(verdiloosRole)
