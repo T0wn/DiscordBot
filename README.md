@@ -3,7 +3,7 @@
 This is a personal discordbot used in my own discord server.
 
 The idea behind the bot started as a joke. I wanted to prank my friends by keeping them trapped in a voice channel.
-The bot achives this by removing the roles and privileges of the user when he/she is moved into the voice channel named "Skammekroken" by an admin.
+The bot achieves this by removing the roles and privileges of the user when he/she is moved into the voice channel named "Skammekroken" by an admin.
 The target no longer has privileges to join or see other voice channels.
 When an admin moves the target out of "Skammekroken" the bot will automatically give back roles and privileges.
 
