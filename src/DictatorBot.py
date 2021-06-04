@@ -1,6 +1,8 @@
 import discord
 from asyncio import sleep
 
+from discord import activity
+
 class DictatorBot(discord.Client):
     def __init__(self, skammekroken, verdilos):
         super().__init__()
@@ -16,6 +18,8 @@ class DictatorBot(discord.Client):
 
     async def on_ready(self):
         print(f'Logged on as {self.user}')
+        activityVar = discord.Game("Version 2.0.1")
+        await self.change_presence(status=discord.Status.online, activity=activityVar)
 
 
     # Denne kjøres hver gang noe i voice kanalene endrer seg (mute, join, leave, etc..).
