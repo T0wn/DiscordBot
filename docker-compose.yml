@@ -7,6 +7,8 @@ services:
       - .:/app
     secrets:
       - bot_token
+    environment: 
+      - VERSION=dev version
 
 secrets:
   bot_token:
