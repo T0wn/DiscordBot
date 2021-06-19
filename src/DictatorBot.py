@@ -1,4 +1,5 @@
 import discord
+import os
 from asyncio import sleep
 
 class DictatorBot(discord.Client):
@@ -16,6 +17,12 @@ class DictatorBot(discord.Client):
 
     async def on_ready(self):
         print(f'Logged on as {self.user}')
+        
+        version = os.getenv("VERSION")
+        if version is not None:
+            activityVar = discord.Game(f"{version}")
+            await self.change_presence(status=discord.Status.online, activity=activityVar)
+
 
 
     # Denne kjøres hver gang noe i voice kanalene endrer seg (mute, join, leave, etc..).
@@ -27,7 +34,6 @@ class DictatorBot(discord.Client):
 
 
 
-
     # sjekker om en bruker skal shames.
     def should_be_shamed(self, member, oldVoiceState, newVoiceState):
         if member != self.user:
@@ -35,6 +41,7 @@ class DictatorBot(discord.Client):
                 if (newVoiceState.channel.name == self.skammekroken and newVoiceState != oldVoiceState):
                     return True
         return False
+
 
 
     # sjekker om en bruker skal redeemes.
