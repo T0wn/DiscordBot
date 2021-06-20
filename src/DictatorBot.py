@@ -1,14 +1,18 @@
 import discord
 import os
-from asyncio import sleep
+import requests
+import io
+import asyncio
+from PIL import Image
 
 class DictatorBot(discord.Client):
-    def __init__(self, skammekroken, verdilos):
+    def __init__(self, skammekroken="Skammekroken", hornyjail="Hornyjail", verdilos="Verdiløs"):
         super().__init__()
 
         # variabelnavn in case man vil endre navnet på skammekroken kanalen eller verdiløs rollen. 
         self.skammekroken = skammekroken
         self.verdilos = verdilos
+        self.hornyjail = hornyjail
 
         # lagrer rollene til folk som er verdiløse, slik at de kan få de samme rollene tilbake igjen.
         self.shamedMembers = {}
@@ -27,31 +31,34 @@ class DictatorBot(discord.Client):
 
     # Denne kjøres hver gang noe i voice kanalene endrer seg (mute, join, leave, etc..).
     async def on_voice_state_update(self, member, oldVoiceState, newVoiceState):
-        if self.should_be_shamed(member, oldVoiceState, newVoiceState):
+        action = self.get_action(member, oldVoiceState, newVoiceState)
+        if action == "shame":
             await self.shame(member)
-        elif self.should_be_redeemed(member, oldVoiceState, newVoiceState):
+        elif action == "jailshame":
+            await self.jailShame(member)
+        elif action == "redeem":
             await self.redeem(member)
 
 
 
     # sjekker om en bruker skal shames.
-    def should_be_shamed(self, member, oldVoiceState, newVoiceState):
+    def get_action(self, member, oldVoiceState, newVoiceState):
         if member != self.user:
             if oldVoiceState.channel and newVoiceState.channel:
-                if (newVoiceState.channel.name == self.skammekroken and newVoiceState != oldVoiceState):
-                    return True
-        return False
 
+                if newVoiceState != oldVoiceState:
+                    if newVoiceState.channel.name == self.skammekroken:
+                        return "shame"
+                    if newVoiceState.channel.name == self.hornyjail:
+                        return "jailshame"
 
-
-    # sjekker om en bruker skal redeemes.
-    def should_be_redeemed(self, member, oldVoiceState, newVoiceState):
-        if member != self.user:
-            if oldVoiceState.channel and newVoiceState.channel:
-                if newVoiceState.channel.name != self.skammekroken and oldVoiceState.channel.name == self.skammekroken:
-                    if newVoiceState.channel:
-                        return True
-        return False
+                if newVoiceState.channel:
+                    if newVoiceState.channel.name != self.skammekroken and oldVoiceState.channel.name == self.skammekroken:
+                        return "redeem"
+                    if newVoiceState.channel.name != self.hornyjail and oldVoiceState.channel.name == self.hornyjail:
+                        return "redeem"
+                    
+        return "nothing"
 
 
 
@@ -59,14 +66,12 @@ class DictatorBot(discord.Client):
         memberInfo = {'user': member, 'roles': member.roles}
         uid = f"{member.id} {member.guild.id}"
         self.shamedMembers[uid] = memberInfo
-        print(self.shamedMembers)
 
 
 
     def pop_shamed_member(self, member):
         uid = f"{member.id} {member.guild.id}"
         roles_to_assign = self.shamedMembers.pop(uid)['roles'][1:]
-        print(self.shamedMembers)
         return roles_to_assign
         
 
@@ -79,8 +84,8 @@ class DictatorBot(discord.Client):
             raise StopIteration("could not find verdiløs-role in guild")
 
 
-
-    async def shame(self, member):
+    
+    async def set_member_verdiloos(self, member):
         # henter verdiløs rollen i serveren, hvis den finnes
         verdiloosRole = self.get_verdiloosRole(member)
         
@@ -90,26 +95,51 @@ class DictatorBot(discord.Client):
         await member.remove_roles(*member.roles[1:]) # bruker slicer til å fjerne everyone rollen fra listen. Den kan ikke fjernes fra brukere.
         await member.add_roles(verdiloosRole)
 
+
+
+    async def shame(self, member):
+        await self.set_member_verdiloos(member)
+
         # Connecter til voicechannel og spiller shame audio
         try:
             connection = await member.voice.channel.connect()
             audio = discord.FFmpegPCMAudio("./audio/shame-1.mp3")
-
             player = connection.play(audio)
-            
             while connection.is_playing() and len(member.voice.channel.voice_states) > 1:
-                await sleep(1)
+                await asyncio.sleep(1)
             await connection.disconnect()
         except discord.errors.ClientException: # Denne kastes hvis boten allerede er connecta til voicechannelen, f.eks hvis vi kaster 2 personer i skammekroken etter hverandre.
             return
         except Exception as e:
             print(e)
 
+
+
+    async def jailShame(self, member):
+        await self.set_member_verdiloos(member)
+
+        avatar = Image.open(requests.get(member.avatar_url, stream=True).raw)
+        avatar = avatar.resize((400, 400))
+
+        memeImg = Image.open("images/meme.png")
+        memeImg.paste(avatar, (900, 450))
+        
+        memeImgByteArr = io.BytesIO()
+        memeImg.save(memeImgByteArr, format='PNG')
+        memeImgByteArr.seek(0)
+        imgSend = discord.File(memeImgByteArr, filename="hornyjailmeme.png")
+
+        await member.guild.system_channel.send(f"{member.mention}", file=imgSend)
         
 
+        
     async def redeem(self, member):
         # fjerner bruker infoen fra shamed users, og henter rollene som skal gies tilbake
-        roles_to_assign = self.pop_shamed_member(member)
+        try:
+            roles_to_assign = self.pop_shamed_member(member)
+        except KeyError as e:
+            print("Error: Could not find member in shamedmembers")
+            return
         verdiloosRole = self.get_verdiloosRole(member)
         await member.add_roles(*roles_to_assign)
         await member.remove_roles(verdiloosRole)

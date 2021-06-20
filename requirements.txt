@@ -1,2 +1,4 @@
 discord.py[voice]==1.7.1
 get-docker-secret
+Pillow==8.2.0
+requests==2.25.1
