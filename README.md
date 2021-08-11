@@ -20,7 +20,7 @@ Here is an example of how it looks for the users:
   </tr>
 </table>
 
-Over time the bot has gotten more features, like logging and audioplaying.
+Over time the bot has gotten more features, like logging, audioplaying and memeposting.
 
 ## Discord API
 This project uses the discord [Javascript API](https://discord.js.org/#/) and [Python API wrapper](https://pypi.org/project/discord.py/).
