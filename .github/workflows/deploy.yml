@@ -1,16 +1,40 @@
-name: Deploy to docker swarm
+name: Build, push and deploy
 
 on:
-  workflow_dispatch:
+  release:
+    types: [published]
 
 jobs:
-  deploy:
+  build-push:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to swarm
-        uses: sagebind/docker-swarm-deploy-action@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
         with:
-          remote_host: ssh://root@139.177.181.244
-          ssh_private_key: ${{ secrets.DOCKER_SSH_PRIVATE_KEY }}
-          ssh_public_key: ${{ secrets.DOCKER_SSH_PUBLIC_KEY }}
-          args: stack deploy --compose-file docker-compose.prod.yml dictatorbot
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/dictatorbot:${{ github.event.release.tag_name }}
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: build-push
+    steps:
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        script: docker service update --image t0wn/dictatorbot:${{ github.event.release.tag_name }} --env-add VERSION=${{ github.event.release.tag_name }} dictator-bot
