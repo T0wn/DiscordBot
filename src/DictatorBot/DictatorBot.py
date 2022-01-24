@@ -8,6 +8,8 @@ import asyncio
 from PIL import Image
 from discord.ext import commands
 
+from src.DictatorBot.dictatorcommands import DictatorCommands
+
 
 class VoiceAction(Enum):
     SHAME = auto()
@@ -20,6 +22,7 @@ class DictatorBot(discord.Client):
     def __init__(self, skammekroken="Skammekroken", hornyjail="Hornyjail", verdilos="Verdiløs"):
         super().__init__()
         self.bot = commands.Bot(command_prefix='$')
+        self.bot.add_cog(DictatorCommands(self.bot))
 
         # variabelnavn in case man vil endre navnet på skammekroken kanalen eller verdiløs rollen. 
         self.skammekroken = skammekroken
