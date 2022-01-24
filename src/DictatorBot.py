@@ -1,3 +1,5 @@
+from enum import Enum, auto
+
 import discord
 import os
 import requests
@@ -5,6 +7,13 @@ import io
 import asyncio
 from PIL import Image
 from discord.ext import commands
+
+
+class VoiceAction(Enum):
+    SHAME = auto()
+    JAILSHAME = auto()
+    REDEEM = auto()
+    NOTHING = auto()
 
 
 class DictatorBot(discord.Client):
@@ -31,11 +40,11 @@ class DictatorBot(discord.Client):
     # Denne kjøres hver gang noe i voice kanalene endrer seg (mute, join, leave, etc..).
     async def on_voice_state_update(self, member, old_voice_state, new_voice_state):
         action = self.get_action(member, old_voice_state, new_voice_state)
-        if action == "shame":
+        if action == VoiceAction.SHAME:
             await self.shame(member)
-        elif action == "jailshame":
+        elif action == VoiceAction.JAILSHAME:
             await self.jail_shame(member)
-        elif action == "redeem":
+        elif action == VoiceAction.REDEEM:
             await self.redeem(member)
 
     # sjekker om en bruker skal shames.
@@ -45,17 +54,17 @@ class DictatorBot(discord.Client):
 
                 if new_voice_state != old_voice_state:
                     if new_voice_state.channel.name == self.skammekroken:
-                        return "shame"
+                        return VoiceAction.SHAME
                     if new_voice_state.channel.name == self.hornyjail:
-                        return "jailshame"
+                        return VoiceAction.JAILSHAME
 
                 if new_voice_state.channel:
                     if new_voice_state.channel.name != self.skammekroken and old_voice_state.channel.name == self.skammekroken:
-                        return "redeem"
+                        return VoiceAction.REDEEM
                     if new_voice_state.channel.name != self.hornyjail and old_voice_state.channel.name == self.hornyjail:
-                        return "redeem"
+                        return VoiceAction.REDEEM
 
-        return "nothing"
+        return VoiceAction.NOTHING
 
     def add_shamed_member(self, member):
         member_info = {'user': member, 'roles': member.roles}
