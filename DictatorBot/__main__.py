@@ -1,5 +1,5 @@
 from get_docker_secret import get_docker_secret
-from DictatorBot import DictatorBot
+from dictator_bot import DictatorBot
 
 BOT_TOKEN = get_docker_secret("bot_token")
     

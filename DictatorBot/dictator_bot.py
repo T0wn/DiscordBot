@@ -7,8 +7,7 @@ import io
 import asyncio
 from PIL import Image
 from discord.ext import commands
-
-from src.DictatorBot.dictatorcommands import DictatorCommands
+from dictatorcommands import DictatorCommands
 
 
 class VoiceAction(Enum):
@@ -18,19 +17,19 @@ class VoiceAction(Enum):
     NOTHING = auto()
 
 
-class DictatorBot(discord.Client):
+class DictatorBot(commands.Bot):
     def __init__(self, skammekroken="Skammekroken", hornyjail="Hornyjail", verdilos="Verdiløs"):
-        super().__init__()
-        self.bot = commands.Bot(command_prefix='$')
-        self.bot.add_cog(DictatorCommands(self.bot))
+        super().__init__(command_prefix="$")
 
-        # variabelnavn in case man vil endre navnet på skammekroken kanalen eller verdiløs rollen. 
+        # variabelnavn in case man vil endre navnet på skammekroken kanalen eller verdiløs rollen.
         self.skammekroken = skammekroken
         self.verdilos = verdilos
         self.hornyjail = hornyjail
 
         # lagrer rollene til folk som er verdiløse, slik at de kan få de samme rollene tilbake igjen.
         self.shamedMembers = {}
+
+        super().add_cog(DictatorCommands(self))
 
     async def on_ready(self):
         print(f'Logged on as {self.user}')

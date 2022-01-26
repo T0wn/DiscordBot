@@ -13,4 +13,4 @@ COPY . /app
 
 ENTRYPOINT [ "python3", "-u" ]
 
-CMD ["src/main.py"]
+CMD ["DictatorBot/__main__.py"]
