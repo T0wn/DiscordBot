@@ -11,6 +11,8 @@ RUN pip3 install -r requirements.txt
 
 COPY . /app
 
+WORKDIR /app/dictator_bot
+
 ENTRYPOINT [ "python3", "-u" ]
 
-CMD ["DictatorBot/__main__.py"]
+CMD ["__main__.py"]
