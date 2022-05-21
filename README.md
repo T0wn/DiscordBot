@@ -1,13 +1,14 @@
 # DictatorBot
 
-This is a personal discordbot used in my own discord server.
+This is a discord bot used in my own discord server.
 
-The idea behind the bot started as a joke. I wanted to prank my friends by keeping them trapped in a voice channel.
-The bot achieves this by removing the roles and privileges of the user when he/she is moved into the voice channel named "Skammekroken" by an admin.
-The target no longer has privileges to join or see other voice channels.
-When an admin moves the target out of "Skammekroken" the bot will automatically give back roles and privileges.
+### Current features
+* Keeping user locked in a "jail" voice channel
+* audioplaying
+* memeposting
+* logging
 
-Here is an example of how it looks for the users:
+Here is an example of how the jail feature looks for the users:
 
 <table>
   <tr>
@@ -20,7 +21,17 @@ Here is an example of how it looks for the users:
   </tr>
 </table>
 
-Over time the bot has gotten more features, like logging, audioplaying and memeposting.
+### Tech stack
+* [Python](https://www.python.org/)
+* [Discord API](https://pypi.org/project/discord.py/)
+* [Docker](https://www.docker.com/)
+* [Github actions](https://github.com/features/actions)
+* [Linode](https://www.linode.com/)
 
-## Discord API
-This project uses the discord [Javascript API](https://discord.js.org/#/) and [Python API wrapper](https://pypi.org/project/discord.py/).
+## Getting started
+Requires Docker and Docker compose.
+
+### Running locally
+1. Clone the project
+2. Create a file containing the bot-token for the discord bot used for development at `DictatorBot/secrets/dev_bot_token.txt`
+3. Start the bot by running `docker-compose up`
