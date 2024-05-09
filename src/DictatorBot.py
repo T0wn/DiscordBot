@@ -32,7 +32,7 @@ class DictatorBot(discord.Client):
     async def on_ready(self):
         print(f'Logged on as {self.user}')
 
-        version = os.getenv("VERSION")
+        version = os.getenv("BOT_VERSION")
         if version is not None:
             activity_var = discord.Game(f"{version}")
             await self.change_presence(status=discord.Status.online, activity=activity_var)
